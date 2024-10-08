@@ -1,0 +1,11 @@
+services:
+  octoprint:
+    image: octoprint/octoprint
+    restart: unless-stopped
+    ports:
+      - 1234:80
+    volumes:
+      - octoprint:/octoprint
+
+volumes:
+  octoprint:

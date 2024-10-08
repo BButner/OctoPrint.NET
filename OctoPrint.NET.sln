@@ -1,0 +1,40 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F321016A-E563-44B8-984F-C23CA1EDD6DE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPrint.NET.Rest", "src\OctoPrint.NET.Rest\OctoPrint.NET.Rest.csproj", "{3ABC5F7E-9751-4310-96AB-1B692956B71B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OPNetTesting", "OPNetTesting\OPNetTesting.csproj", "{8627D7B9-76EF-4AEE-A4DB-15CFC5B8FC54}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OctoPrint.NET.Rest.Tests", "src\OctoPrint.Net.Rest.Tests\OctoPrint.NET.Rest.Tests.csproj", "{BC179BC2-B60A-4ACB-B0F6-F15FE6101D11}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{3ABC5F7E-9751-4310-96AB-1B692956B71B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3ABC5F7E-9751-4310-96AB-1B692956B71B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3ABC5F7E-9751-4310-96AB-1B692956B71B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3ABC5F7E-9751-4310-96AB-1B692956B71B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8627D7B9-76EF-4AEE-A4DB-15CFC5B8FC54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8627D7B9-76EF-4AEE-A4DB-15CFC5B8FC54}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8627D7B9-76EF-4AEE-A4DB-15CFC5B8FC54}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8627D7B9-76EF-4AEE-A4DB-15CFC5B8FC54}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC179BC2-B60A-4ACB-B0F6-F15FE6101D11}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC179BC2-B60A-4ACB-B0F6-F15FE6101D11}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC179BC2-B60A-4ACB-B0F6-F15FE6101D11}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC179BC2-B60A-4ACB-B0F6-F15FE6101D11}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3ABC5F7E-9751-4310-96AB-1B692956B71B} = {F321016A-E563-44B8-984F-C23CA1EDD6DE}
+		{BC179BC2-B60A-4ACB-B0F6-F15FE6101D11} = {F321016A-E563-44B8-984F-C23CA1EDD6DE}
+	EndGlobalSection
+EndGlobal
