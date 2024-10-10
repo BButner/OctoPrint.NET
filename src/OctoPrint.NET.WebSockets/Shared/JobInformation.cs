@@ -1,11 +1,11 @@
-using OctoPrint.NET.WebSockets.Shared;
+using OctoPrint.NET.WebSockets.Current;
 
-namespace OctoPrint.NET.WebSockets.Current;
+namespace OctoPrint.NET.WebSockets.Shared;
 
 /// <summary>
 /// The current job, part of the <see cref="CurrentMessage"/>.
 /// </summary>
-public class CurrentJob
+public class JobInformation
 {
     /// <summary>
     /// The current <see cref="JobFile"/> loaded. The file properties will be null if there is no job running.

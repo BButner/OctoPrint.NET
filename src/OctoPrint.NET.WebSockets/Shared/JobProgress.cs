@@ -6,12 +6,12 @@ namespace OctoPrint.NET.WebSockets.Shared;
 public class JobProgress
 {
     /// <summary>
-    /// The current completion percentage.
+    /// Percentage of completion of the current print job
     /// </summary>
     public double? Completion { get; init; }
 
     /// <summary>
-    /// The current file pos.
+    /// Current position in the file being printed, in bytes from the beginning.
     /// </summary>
     public int? FilePos { get; init; }
 
