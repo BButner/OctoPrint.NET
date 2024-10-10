@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using OctoPrint.NET.Json;
+using OctoPrint.NET.WebSockets.Current;
 using OctoPrint.NET.WebSockets.Events;
 
 namespace OctoPrint.NET.WebSockets;
@@ -143,6 +144,7 @@ public class OctoPrintWebSocketClient
         if (rawJsonObject is null) return;
 
         var e = rawJsonObject["event"];
+        var current = rawJsonObject["current"];
 
         if (e is not null)
         {
@@ -152,9 +154,23 @@ public class OctoPrintWebSocketClient
             // TODO: We should somehow log thrown away events.
             if (type is not null && payload is not null)
             {
-                var deserializedEvent = await EventDeserializer.TryDeserializeEvent(type.ToString(), payload);
+                var deserializedEvent = await EventDeserializer.TryDeserializeEvent(type.ToJsonString(), payload);
 
                 Console.WriteLine(deserializedEvent?.GetType());
+            }
+        }
+
+        if (current is not null)
+        {
+            try
+            {
+                var deserializedCurrent =
+                    JsonSerializer.Deserialize<CurrentMessage>(current.ToJsonString(),
+                        OctoPrintJson.DefaultSerializerOptions);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Exception during Deserializing CurrentMessage: {ex}");
             }
         }
     }

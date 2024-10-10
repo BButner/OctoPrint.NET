@@ -13,7 +13,7 @@ public class PrinterTemperatures
     /// <summary>
     /// The time of the temperature readings.
     /// </summary>
-    public uint Time { get; set; }
+    public int Time { get; set; }
 
     /// <summary>
     /// The dynamic temperature data points.
@@ -31,7 +31,7 @@ public class PrinterTemperaturesJsonConverter : JsonConverter<PrinterTemperature
     public override PrinterTemperatures? Read(ref Utf8JsonReader reader, Type typeToConvert,
         JsonSerializerOptions options)
     {
-        if (reader.TokenType != JsonTokenType.StartObject)
+        if (reader.TokenType != JsonTokenType.StartObject && reader.TokenType != JsonTokenType.StartArray)
         {
             throw new JsonException();
         }
@@ -53,7 +53,7 @@ public class PrinterTemperaturesJsonConverter : JsonConverter<PrinterTemperature
                 switch (propertyName)
                 {
                     case not null when propertyName.ToLower().Equals(nameof(PrinterTemperatures.Time).ToLower()):
-                        temps.Time = reader.GetUInt32();
+                        temps.Time = reader.GetInt32();
                         break;
                     case not null:
                         var dataPoint =

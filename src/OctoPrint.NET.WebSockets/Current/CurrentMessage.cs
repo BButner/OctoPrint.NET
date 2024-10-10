@@ -40,7 +40,7 @@ public class CurrentMessage
     /// <summary>
     /// Temperature readings.
     /// </summary>
-    public required PrinterTemperatures Temps { get; init; }
+    public required IEnumerable<PrinterTemperatures> Temps { get; init; }
 
     /// <summary>
     /// Busy files, if there are any.

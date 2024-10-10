@@ -18,12 +18,12 @@ public class JobProgress
     /// <summary>
     /// How long the print has been running in seconds.
     /// </summary>
-    public uint? PrintTime { get; init; }
+    public int? PrintTime { get; init; }
 
     /// <summary>
     /// How long the print has left in seconds.
     /// </summary>
-    public uint? PrintTimeLeft { get; init; }
+    public int? PrintTimeLeft { get; init; }
 
     /// <summary>
     /// The origin of the print time left.

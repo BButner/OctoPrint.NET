@@ -15,17 +15,17 @@ public class JobInformation
     /// <summary>
     /// The estimated print time in seconds, if there is currently a print loaded.
     /// </summary>
-    public uint? EstimatedPrintTime { get; init; }
+    public double? EstimatedPrintTime { get; init; }
 
     /// <summary>
     /// The average print time in seconds, if there is one.
     /// </summary>
-    public uint? AveragePrintTime { get; init; }
+    public double? AveragePrintTime { get; init; }
 
     /// <summary>
     /// The last print time as a unix epoch timestamp, if there is one.
     /// </summary>
-    public uint? LastPrintTime { get; init; }
+    public double? LastPrintTime { get; init; }
 
     /// <summary>
     /// The user who started the job, if there is one.
