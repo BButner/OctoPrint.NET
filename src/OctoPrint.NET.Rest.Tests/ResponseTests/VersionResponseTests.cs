@@ -1,6 +1,6 @@
 using System.Text.Json;
+using OctoPrint.NET.Json;
 using OctoPrint.NET.Rest.Models.Response;
-using OctoPrint.NET.Rest.Requester;
 
 namespace OctoPrint.NET.Rest.Tests.ResponseTests;
 
@@ -17,7 +17,7 @@ public class VersionResponseTests
                        }
                        """;
         var versionInfo =
-            JsonSerializer.Deserialize<VersionResponse>(contents, OctoPrintRequester.DefaultSerializerOptions);
+            JsonSerializer.Deserialize<VersionResponse>(contents, OctoPrintJson.DefaultSerializerOptions);
 
         Assert.NotNull(versionInfo);
     }

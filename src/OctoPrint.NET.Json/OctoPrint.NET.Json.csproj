@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\OctoPrint.NET.Json\OctoPrint.NET.Json.csproj" />
-    <ProjectReference Include="..\OctoPrint.NET.WebSockets\OctoPrint.NET.WebSockets.csproj" />
-  </ItemGroup>
-
 </Project>

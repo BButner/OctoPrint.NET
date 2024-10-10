@@ -1,52 +1,103 @@
 using System.Net.Http.Headers;
 using System.Net.WebSockets;
+using System.Security.Authentication;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using OctoPrint.NET.Json;
+using OctoPrint.NET.WebSockets.Events;
 
 namespace OctoPrint.NET.WebSockets;
 
+/// <summary>
+/// WebSocket client to connect to OctoPrint.
+/// </summary>
 public class OctoPrintWebSocketClient
 {
+    /// <summary>
+    /// Event raised when the client successfully connects and authenticates.
+    /// </summary>
+    public event EventHandler? ClientConnected;
+
+    /// <summary>
+    /// Creates a new <see cref="OctoPrintWebSocketClient"/>.
+    /// </summary>
+    /// 
+    /// <param name="hostname">
+    /// The hostname of the OctoPrint instance.
+    /// </param>
+    /// <param name="port">
+    /// The port of the OctoPrint instance.
+    /// </param>
+    /// <param name="apiKey">
+    /// The API Key used to authorize requests.
+    /// </param>
     public OctoPrintWebSocketClient(string hostname, int port, string apiKey)
     {
-        _hostname = hostname;
-        _port = port;
-        _uri = new UriBuilder("ws", hostname, port, "/sockjs/websocket").Uri;
+        _restUri = new UriBuilder("http", hostname, port).Uri;
+        _webSocketUri = new UriBuilder("ws", hostname, port, "/sockjs/websocket").Uri;
         _apiKey = apiKey;
 
         _connection = new ClientWebSocket();
-
-        _ = Receive();
     }
 
+    /// <summary>
+    /// Task that lives for the duration of the WebSocket connection.
+    /// </summary>
     public Task Connection => _connectionTask.Task;
+
+    /// <summary>
+    /// Method used to initialize the connection to the WebSocket server.
+    /// </summary>
+    public async Task Initialize()
+    {
+        await _connection.ConnectAsync(_webSocketUri, _connectionToken);
+
+        _ = Receive();
+
+        await Authenticate();
+
+        ClientConnected?.Invoke(this, EventArgs.Empty);
+    }
 
     private async Task Authenticate()
     {
-        var tempClient = new HttpClient()
+        var tempClient = new HttpClient
         {
-            BaseAddress = new UriBuilder("http", _hostname, _port).Uri,
+            BaseAddress = _restUri,
             DefaultRequestHeaders =
             {
                 Authorization = new AuthenticationHeaderValue("Bearer", _apiKey),
-            },
+            }
         };
 
-        var content = new StringContent(JsonSerializer.Serialize(new { passive = true }), Encoding.UTF8,
-            "application/json");
+        var content = new StringContent(
+            JsonSerializer.Serialize(new { passive = true }),
+            Encoding.UTF8,
+            "application/json"
+        );
 
-        var res = await tempClient.PostAsync(new Uri("/api/login", UriKind.Relative),
-            content, _connectionToken);
+        var res = await tempClient.PostAsync(
+            _authEndpoint,
+            content, _connectionToken
+        );
 
         var responseContent =
             JsonSerializer.Deserialize<JsonNode>(await res.Content.ReadAsStringAsync(_connectionToken));
-        if (responseContent is null) return;
+
+        if (responseContent is null)
+        {
+            throw new AuthenticationException("Could not authenticate with WebSocket backend, response was empty.");
+        }
 
         var name = responseContent["name"];
         var session = responseContent["session"];
 
-        if (name is null || session is null) return;
+        if (name is null || session is null)
+        {
+            throw new AuthenticationException(
+                "Could not authenticate with WebSocket backend, name or session was null.");
+        }
 
         await _connection.SendAsync(
             new ArraySegment<byte>(Encoding.UTF8.GetBytes($"{{ \"auth\": \"{name}:{session}\" }}")),
@@ -57,10 +108,6 @@ public class OctoPrintWebSocketClient
 
     private async Task Receive()
     {
-        await _connection.ConnectAsync(_uri, _connectionToken);
-
-        await Authenticate();
-
         var buffer = new byte[8192];
 
         while (!_connectionToken.IsCancellationRequested)
@@ -72,7 +119,7 @@ public class OctoPrintWebSocketClient
             {
                 result = await _connection.ReceiveAsync(new ArraySegment<byte>(buffer), _connectionToken);
                 if (result.MessageType != WebSocketMessageType.Close)
-                    await outputStream.WriteAsync(buffer, 0, result.Count, _connectionToken);
+                    await outputStream.WriteAsync(buffer.AsMemory(0, result.Count), _connectionToken);
             } while (!result?.EndOfMessage ?? false);
 
             if (result?.MessageType == WebSocketMessageType.Close)
@@ -88,16 +135,37 @@ public class OctoPrintWebSocketClient
 
     private async Task ResponseReceived(Stream inputStream)
     {
-        var reader = new StreamReader(inputStream);
+        var rawJsonObject = await JsonSerializer.DeserializeAsync<JsonNode>(inputStream,
+            OctoPrintJson.DefaultSerializerOptions, _connectionToken);
 
-        Console.WriteLine(await reader.ReadToEndAsync(_connectionToken));
+        // TODO: We should somehow log thrown away messages that we receive.
+        Console.WriteLine(rawJsonObject?.ToJsonString());
+        if (rawJsonObject is null) return;
+
+        var e = rawJsonObject["event"];
+
+        if (e is not null)
+        {
+            var type = e["type"];
+            var payload = e["payload"];
+
+            // TODO: We should somehow log thrown away events.
+            if (type is not null && payload is not null)
+            {
+                var deserializedEvent = await EventDeserializer.TryDeserializeEvent(type.ToString(), payload);
+
+                Console.WriteLine(deserializedEvent?.GetType());
+            }
+        }
     }
 
-    private string _hostname;
-    private int _port;
-    private Uri _uri;
-    private string _apiKey;
-    private CancellationToken _connectionToken = new();
-    private TaskCompletionSource _connectionTask = new();
-    private ClientWebSocket _connection;
+    private readonly string _apiKey;
+
+    private readonly Uri _restUri;
+    private readonly Uri _webSocketUri;
+    private readonly Uri _authEndpoint = new("/api/login", UriKind.Relative);
+
+    private readonly CancellationToken _connectionToken = new();
+    private readonly TaskCompletionSource _connectionTask = new();
+    private readonly ClientWebSocket _connection;
 }

@@ -1,7 +1,6 @@
 using System.Text.Json;
-using System.Text.Json.Nodes;
+using OctoPrint.NET.Json;
 using OctoPrint.NET.Rest.Models.Request;
-using OctoPrint.NET.Rest.Requester;
 
 namespace OctoPrint.NET.Rest.Tests.RequestTests;
 
@@ -23,7 +22,7 @@ public class ConnectionRequestTests
             AutoConnect = true
         };
 
-        var serializedJson = JsonSerializer.Serialize(connectRequest, OctoPrintRequester.DefaultSerializerOptions);
+        var serializedJson = JsonSerializer.Serialize(connectRequest, OctoPrintJson.DefaultSerializerOptions);
 
         Assert.Equal(serialized, serializedJson);
     }
@@ -39,7 +38,7 @@ public class ConnectionRequestTests
             Command = ConnectionCommand.Disconnect
         };
 
-        var serializedJson = JsonSerializer.Serialize(disconnectRequest, OctoPrintRequester.DefaultSerializerOptions);
+        var serializedJson = JsonSerializer.Serialize(disconnectRequest, OctoPrintJson.DefaultSerializerOptions);
 
         Assert.Equal(serialized, serializedJson);
     }
@@ -55,7 +54,7 @@ public class ConnectionRequestTests
             Command = ConnectionCommand.FakeAck
         };
 
-        var serializedJson = JsonSerializer.Serialize(fakeAckRequest, OctoPrintRequester.DefaultSerializerOptions);
+        var serializedJson = JsonSerializer.Serialize(fakeAckRequest, OctoPrintJson.DefaultSerializerOptions);
 
         Assert.Equal(serialized, serializedJson);
     }
