@@ -20,4 +20,10 @@ public static class OctoPrintJson
         },
         DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
     };
+
+    /// <summary>
+    /// Default method to use for deserializing.
+    /// </summary>
+    public static T? Deserialize<T>(string contents) =>
+        JsonSerializer.Deserialize<T>(contents, DefaultSerializerOptions);
 }

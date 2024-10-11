@@ -7,11 +7,12 @@ namespace OctoPrint.NET.WebSockets.Events;
 /// </summary>
 public static class EventDeserializer
 {
-    public static async Task<OctoPrintWebHookEvent?> TryDeserializeEvent(string type, JsonNode payload)
+    public static async Task<OctoPrintWebSocketEvent?> TryDeserializeEvent(string type, JsonNode payload)
     {
         return type switch
         {
             "PrinterStateChanged" => payload.GetValue<PrinterStateChangedEvent>(),
+            "ZChange" => payload.GetValue<ZChangeEvent>(),
             _ => null,
         };
     }

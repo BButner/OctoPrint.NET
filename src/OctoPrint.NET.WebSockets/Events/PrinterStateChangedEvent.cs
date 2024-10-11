@@ -3,7 +3,7 @@ namespace OctoPrint.NET.WebSockets.Events;
 /// <summary>
 /// Event raised when the printer state changes.
 /// </summary>
-public class PrinterStateChangedEvent : OctoPrintWebHookEvent
+public class PrinterStateChangedEvent : OctoPrintWebSocketEvent
 {
     /// <summary>
     /// The event state id.

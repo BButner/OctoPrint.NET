@@ -1,5 +1,6 @@
 using System.Net.Http.Headers;
 using System.Net.WebSockets;
+using System.Reactive.Subjects;
 using System.Security.Authentication;
 using System.Text;
 using System.Text.Json;
@@ -46,6 +47,11 @@ public class OctoPrintWebSocketClient
     /// Task that lives for the duration of the WebSocket connection.
     /// </summary>
     public Task Connection => _connectionTask.Task;
+
+    /// <summary>
+    /// Observes the incoming messages from the OctoPrint WebSocket server.
+    /// </summary>
+    public IObservable<OctoPrintWebSocketMessageReceived> ReceivedMessages => _messageReceivedSubject;
 
     /// <summary>
     /// Method used to initialize the connection to the WebSocket server.
@@ -136,43 +142,66 @@ public class OctoPrintWebSocketClient
 
     private async Task ResponseReceived(Stream inputStream)
     {
-        var rawJsonObject = await JsonSerializer.DeserializeAsync<JsonNode>(inputStream,
-            OctoPrintJson.DefaultSerializerOptions, _connectionToken);
+        var contents = await new StreamReader(inputStream).ReadToEndAsync(_connectionToken);
 
-        // TODO: We should somehow log thrown away messages that we receive.
-        Console.WriteLine(rawJsonObject?.ToJsonString());
-        if (rawJsonObject is null) return;
-
-        var e = rawJsonObject["event"];
-        var current = rawJsonObject["current"];
-
-        if (e is not null)
+        try
         {
-            var type = e["type"];
-            var payload = e["payload"];
-
-            // TODO: We should somehow log thrown away events.
-            if (type is not null && payload is not null)
-            {
-                var deserializedEvent = await EventDeserializer.TryDeserializeEvent(type.ToJsonString(), payload);
-
-                Console.WriteLine(deserializedEvent?.GetType());
-            }
+            var message = OctoPrintJson.Deserialize<OctoPrintWebSocketMessageReceived>(contents);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Exception Deserializing Message: {ex}");
         }
 
-        if (current is not null)
-        {
-            try
-            {
-                var deserializedCurrent =
-                    JsonSerializer.Deserialize<CurrentMessage>(current.ToJsonString(),
-                        OctoPrintJson.DefaultSerializerOptions);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Exception during Deserializing CurrentMessage: {ex}");
-            }
-        }
+        // var rawJsonObject = await JsonSerializer.DeserializeAsync<JsonNode>(inputStream,
+        //     OctoPrintJson.DefaultSerializerOptions, _connectionToken);
+        //
+        // // TODO: We should somehow log thrown away messages that we receive.
+        // if (rawJsonObject is null) return;
+
+        // var e = rawJsonObject["event"];
+        // var current = rawJsonObject["current"];
+        //
+        // if (e is not null)
+        // {
+        //     var type = e["type"];
+        //     var payload = e["payload"];
+        //
+        //     // TODO: We should somehow log thrown away events.
+        //     if (type is not null && payload is not null)
+        //     {
+        //         try
+        //         {
+        //             var deserializedEvent = await EventDeserializer.TryDeserializeEvent(type.ToJsonString(), payload);
+        //
+        //             if (deserializedEvent is null)
+        //             {
+        //                 Console.WriteLine($"Unknown event: {rawJsonObject.ToJsonString()}");
+        //             }
+        //         }
+        //         catch (Exception ex)
+        //         {
+        //             Console.WriteLine($"Exception during Deserializing Event: {ex}");
+        //         }
+        //     }
+        // }
+        // else if (current is not null)
+        // {
+        //     try
+        //     {
+        //         var deserializedCurrent =
+        //             JsonSerializer.Deserialize<CurrentMessage>(current.ToJsonString(),
+        //                 OctoPrintJson.DefaultSerializerOptions);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Console.WriteLine($"Exception during Deserializing CurrentMessage: {ex}");
+        //     }
+        // }
+        // else
+        // {
+        //     Console.WriteLine(rawJsonObject?.ToJsonString());
+        // }
     }
 
     private readonly string _apiKey;
@@ -184,4 +213,6 @@ public class OctoPrintWebSocketClient
     private readonly CancellationToken _connectionToken = new();
     private readonly TaskCompletionSource _connectionTask = new();
     private readonly ClientWebSocket _connection;
+
+    private readonly Subject<OctoPrintWebSocketMessageReceived> _messageReceivedSubject = new();
 }
