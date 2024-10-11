@@ -1,9 +1,7 @@
-using OctoPrint.NET.WebSockets.Current;
-
-namespace OctoPrint.NET.WebSockets.Shared;
+namespace OctoPrint.NET.Json.Models.Shared;
 
 /// <summary>
-/// Current state, part of the <see cref="CurrentMessage"/>.
+/// Current Printer State.
 /// </summary>
 public class PrinterState
 {

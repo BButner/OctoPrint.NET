@@ -1,4 +1,4 @@
-namespace OctoPrint.NET.WebSockets.Shared;
+namespace OctoPrint.NET.Json.Models.Shared;
 
 /// <summary>
 /// Temperature data.
@@ -14,4 +14,9 @@ public class TemperatureData
     /// The current temperature target.
     /// </summary>
     public double? Target { get; init; }
+
+    /// <summary>
+    /// The current temperature offset. This will not be included in history.
+    /// </summary>
+    public double? Offset { get; init; }
 }

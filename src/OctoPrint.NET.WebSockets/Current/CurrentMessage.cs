@@ -1,3 +1,4 @@
+using OctoPrint.NET.Json.Models.Shared;
 using OctoPrint.NET.WebSockets.Shared;
 
 namespace OctoPrint.NET.WebSockets.Current;

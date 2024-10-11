@@ -1,8 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using OctoPrint.NET.Json;
 
-namespace OctoPrint.NET.WebSockets.Shared;
+namespace OctoPrint.NET.Json.Models.Shared;
 
 /// <summary>
 /// Current printer temperatures.
