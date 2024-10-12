@@ -7,8 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\OctoPrint.NET.Json\OctoPrint.NET.Json.csproj" />
-    <ProjectReference Include="..\OctoPrint.NET.WebSockets\OctoPrint.NET.WebSockets.csproj" />
+    <Folder Include="Models\Response\" />
   </ItemGroup>
 
 </Project>
