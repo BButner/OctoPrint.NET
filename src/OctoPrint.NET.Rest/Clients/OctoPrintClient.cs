@@ -1,5 +1,6 @@
 using OctoPrint.NET.Rest.Clients.Interfaces;
 using OctoPrint.NET.Rest.Requester;
+using OctoPrint.NET.WebSockets;
 
 namespace OctoPrint.NET.Rest.Clients;
 
@@ -48,6 +49,7 @@ public class OctoPrintClient : IOctoPrintClient
         Connection = new ConnectionClient(_restClient);
         Server = new ServerClient(_restClient);
         Version = new VersionClient(_restClient);
+        WebSockets = new OctoPrintWebSocketClient(hostname, port, apiKey);
     }
 
     /// <inheritdoc/>
@@ -67,6 +69,8 @@ public class OctoPrintClient : IOctoPrintClient
 
     /// <inheritdoc/>
     public IVersionClient Version { get; init; }
+
+    public OctoPrintWebSocketClient WebSockets { get; init; }
 
     private readonly IApiRequester _restClient;
 }
