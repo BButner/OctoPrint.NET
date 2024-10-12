@@ -1,6 +1,7 @@
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using OctoPrint.NET.Json;
+using OctoPrint.NET.WebSockets.Current;
 using OctoPrint.NET.WebSockets.Events;
 
 namespace OctoPrint.NET.WebSockets;
@@ -14,6 +15,8 @@ public class WebSocketMessageJsonConverter : JsonConverter<OctoPrintWebSocketMes
     public override OctoPrintWebSocketMessageReceived? Read(ref Utf8JsonReader reader, Type typeToConvert,
         JsonSerializerOptions options)
     {
+        OctoPrintWebSocketMessageReceived? messageReceived = null;
+
         if (reader.TokenType != JsonTokenType.StartObject)
         {
             throw new JsonException();
@@ -25,49 +28,54 @@ public class WebSocketMessageJsonConverter : JsonConverter<OctoPrintWebSocketMes
             throw new JsonException();
         }
 
-        var outerDiscrim = reader.GetString();
+        var outerDiscrim = reader.GetString()?.ToLower();
         if (outerDiscrim is null)
         {
             throw new JsonException();
         }
 
-        while (reader.Read())
+        if (outerDiscrim.Equals("current", StringComparison.CurrentCultureIgnoreCase))
         {
-            Console.WriteLine($"Reading: {reader.TokenType}");
+            reader.Read();
+            messageReceived = OctoPrintJson.Deserialize<CurrentMessage>(ref reader);
 
-            if (reader.TokenType is JsonTokenType.PropertyName)
+            while (reader.Read())
             {
-                Console.WriteLine($"Found Property: {reader.TokenType}");
+                if (reader.TokenType == JsonTokenType.EndObject && reader.CurrentDepth == 0)
+                {
+                    return messageReceived;
+                }
+            }
+        }
+        else
+        {
+            while (reader.Read())
+            {
+                if (reader.TokenType != JsonTokenType.PropertyName || reader.CurrentDepth != 2) continue;
+
+                var innerDiscrim = reader.GetString()?.ToLower();
+
+                if (innerDiscrim == "type")
+                {
+                    reader.Read();
+                    if (reader.TokenType == JsonTokenType.String)
+                    {
+                        innerDiscrim = reader.GetString()?.ToLower();
+                        reader.Read();
+                    }
+                }
+
+                messageReceived = (outerDiscrim, innerDiscrim) switch
+                {
+                    ("event", "zchange") => OctoPrintJson.Deserialize<ZChangeEvent>(ref reader),
+                    ("event", "capturestart") => OctoPrintJson.Deserialize<CaptureStartEvent>(ref reader),
+                    ("event", "capturedone") => OctoPrintJson.Deserialize<CaptureDoneEvent>(ref reader),
+                    _ => null,
+                };
             }
         }
 
-        // reader.Read();
-        // if (outerDiscrim.Equals("event", StringComparison.CurrentCultureIgnoreCase))
-        // {
-        //     using var doc = JsonDocument.ParseValue(ref reader);
-        //     var eventType = doc.RootElement.GetProperty("type").GetString()?.ToLower();
-        //
-        //     switch (eventType)
-        //     {
-        //         case "zchange":
-        //             while (reader.Read())
-        //             {
-        //             }
-        //             return Deserialize<ZChangeEvent>(doc.RootElement.GetProperty("payload").ToString());
-        //         default:
-        //             Console.WriteLine(doc.RootElement.GetProperty("payload"));
-        //             throw new JsonException($"Unknown event type: {eventType}");
-        //     }
-        // }
-        // else
-        // {
-        //     while (reader.Read())
-        //     {
-        //     }
-        // }
-
-
-        return null;
+        return messageReceived;
     }
 
     public override void Write(Utf8JsonWriter writer, OctoPrintWebSocketMessageReceived value,

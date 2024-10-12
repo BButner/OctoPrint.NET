@@ -147,61 +147,20 @@ public class OctoPrintWebSocketClient
         try
         {
             var message = OctoPrintJson.Deserialize<OctoPrintWebSocketMessageReceived>(contents);
+
+            if (message is null)
+            {
+                Console.WriteLine(contents);
+            }
+            else
+            {
+                Console.WriteLine($"Got message type: {message.GetType()}");
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Exception Deserializing Message: {ex}");
         }
-
-        // var rawJsonObject = await JsonSerializer.DeserializeAsync<JsonNode>(inputStream,
-        //     OctoPrintJson.DefaultSerializerOptions, _connectionToken);
-        //
-        // // TODO: We should somehow log thrown away messages that we receive.
-        // if (rawJsonObject is null) return;
-
-        // var e = rawJsonObject["event"];
-        // var current = rawJsonObject["current"];
-        //
-        // if (e is not null)
-        // {
-        //     var type = e["type"];
-        //     var payload = e["payload"];
-        //
-        //     // TODO: We should somehow log thrown away events.
-        //     if (type is not null && payload is not null)
-        //     {
-        //         try
-        //         {
-        //             var deserializedEvent = await EventDeserializer.TryDeserializeEvent(type.ToJsonString(), payload);
-        //
-        //             if (deserializedEvent is null)
-        //             {
-        //                 Console.WriteLine($"Unknown event: {rawJsonObject.ToJsonString()}");
-        //             }
-        //         }
-        //         catch (Exception ex)
-        //         {
-        //             Console.WriteLine($"Exception during Deserializing Event: {ex}");
-        //         }
-        //     }
-        // }
-        // else if (current is not null)
-        // {
-        //     try
-        //     {
-        //         var deserializedCurrent =
-        //             JsonSerializer.Deserialize<CurrentMessage>(current.ToJsonString(),
-        //                 OctoPrintJson.DefaultSerializerOptions);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         Console.WriteLine($"Exception during Deserializing CurrentMessage: {ex}");
-        //     }
-        // }
-        // else
-        // {
-        //     Console.WriteLine(rawJsonObject?.ToJsonString());
-        // }
     }
 
     private readonly string _apiKey;

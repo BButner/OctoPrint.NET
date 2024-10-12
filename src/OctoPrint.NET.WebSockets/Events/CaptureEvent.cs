@@ -3,7 +3,7 @@ namespace OctoPrint.NET.WebSockets.Events;
 /// <summary>
 /// Base class for a webcam capture.
 /// </summary>
-public abstract class CaptureEvent
+public abstract class CaptureEvent : OctoPrintWebSocketEvent
 {
     /// <summary>
     /// The file path for the capture.
