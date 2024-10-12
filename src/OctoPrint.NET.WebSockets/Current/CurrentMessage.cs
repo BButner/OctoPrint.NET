@@ -6,7 +6,7 @@ namespace OctoPrint.NET.WebSockets.Current;
 /// <summary>
 /// Current status message received from the webhook.
 /// </summary>
-public class CurrentMessage : OctoPrintWebSocketMessageReceived
+public class CurrentMessage : OctoPrintWebSocketMessage
 {
     /// <summary>
     /// The current printer state.

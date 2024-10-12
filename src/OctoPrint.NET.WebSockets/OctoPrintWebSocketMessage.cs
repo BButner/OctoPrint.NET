@@ -6,6 +6,6 @@ namespace OctoPrint.NET.WebSockets;
 /// Base class for any OctoPrint WebHook Message that we receive.
 /// </summary>
 [JsonConverter(typeof(WebSocketMessageJsonConverter))]
-public abstract class OctoPrintWebSocketMessageReceived
+public abstract class OctoPrintWebSocketMessage
 {
 }

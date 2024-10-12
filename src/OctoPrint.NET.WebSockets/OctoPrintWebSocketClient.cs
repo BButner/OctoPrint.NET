@@ -51,7 +51,7 @@ public class OctoPrintWebSocketClient
     /// <summary>
     /// Observes the incoming messages from the OctoPrint WebSocket server.
     /// </summary>
-    public IObservable<OctoPrintWebSocketMessageReceived> ReceivedMessages => _messageReceivedSubject;
+    public IObservable<OctoPrintWebSocketMessage> ReceivedMessages => _messageReceivedSubject;
 
     /// <summary>
     /// Method used to initialize the connection to the WebSocket server.
@@ -146,7 +146,7 @@ public class OctoPrintWebSocketClient
 
         try
         {
-            var message = OctoPrintJson.Deserialize<OctoPrintWebSocketMessageReceived>(contents);
+            var message = OctoPrintJson.Deserialize<OctoPrintWebSocketMessage>(contents);
 
             if (message is null)
             {
@@ -173,5 +173,5 @@ public class OctoPrintWebSocketClient
     private readonly TaskCompletionSource _connectionTask = new();
     private readonly ClientWebSocket _connection;
 
-    private readonly Subject<OctoPrintWebSocketMessageReceived> _messageReceivedSubject = new();
+    private readonly Subject<OctoPrintWebSocketMessage> _messageReceivedSubject = new();
 }
