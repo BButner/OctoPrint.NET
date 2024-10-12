@@ -65,11 +65,15 @@ public class WebSocketMessageJsonConverter : JsonConverter<OctoPrintWebSocketMes
                     }
                 }
 
-                messageReceived = (outerDiscrim, innerDiscrim) switch
+                messageReceived = outerDiscrim switch
                 {
-                    ("event", "zchange") => OctoPrintJson.Deserialize<ZChangeEvent>(ref reader),
-                    ("event", "capturestart") => OctoPrintJson.Deserialize<CaptureStartEvent>(ref reader),
-                    ("event", "capturedone") => OctoPrintJson.Deserialize<CaptureDoneEvent>(ref reader),
+                    "event" => innerDiscrim switch
+                    {
+                        "capturedone" => OctoPrintJson.Deserialize<CaptureDoneEvent>(ref reader),
+                        "capturestart" => OctoPrintJson.Deserialize<CaptureStartEvent>(ref reader),
+                        "zchange" => OctoPrintJson.Deserialize<ZChangeEvent>(ref reader),
+                        _ => null,
+                    },
                     _ => null,
                 };
             }
